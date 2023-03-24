@@ -1,0 +1,36 @@
+package:
+  id: re2
+  name: re2
+  version: 2.5.0
+  kind: lib
+  discription: |
+    re2
+
+base:
+  id: org.deepin.base
+  version: 20.5.0
+
+source:
+  kind: git
+  url: https://github.com/deepin-community/re2.git
+  version: master
+  commit: da2b6d759bb8561d58fb9ae50d00c4da46eb2aa1
+  patch:
+  - parallel-test-runner.patch
+  - debian-unicode-data.patch
+build:
+  kind: manual
+  manual:
+    configure: |
+      #exec bash
+      perl re2/make_perl_groups.pl > re2/perl_groups.cc
+      python re2/make_unicode_casefold.py > re2/unicode_casefold.cc
+      python re2/make_unicode_groups.py > re2/unicode_groups.cc
+
+      mkdir build
+      cd build
+      cmake -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+            -DCMAKE_INSTALL_LIBDIR=${PREFIX}/lib \
+            -DBUILD_SHARED_LIBS=ON ..
+      make -j6
+      make -j install
